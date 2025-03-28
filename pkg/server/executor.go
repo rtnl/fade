@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/rtnl/fade/pkg/proto"
 	"github.com/samber/mo"
 	"time"
@@ -61,7 +62,7 @@ func (e *Executor) Run(ctx context.Context) {
 			continue
 		}
 
-		entry.resolve(proto.NewRes(proto.ResCodeOk, "test"))
+		e.Execute(ctx, entry)
 	}
 }
 
@@ -69,4 +70,31 @@ func (e *Executor) Handle(req *proto.Req) *mo.Future[*proto.Res] {
 	return mo.NewFuture[*proto.Res](func(resolve func(*proto.Res), reject func(error)) {
 		e.queue <- NewExecutorEntry(req, resolve, reject)
 	})
+}
+
+func (e *Executor) Execute(ctx context.Context, entry *ExecutorEntry) {
+	var (
+		req     *proto.Req
+		res     *proto.Res
+		handler Handler
+		ok      bool
+		err     error
+	)
+
+	req = entry.req
+
+	handler, ok = e.server.GetHandlerByKey(req.GetMethod()).Get()
+	if !ok {
+		entry.reject(fmt.Errorf("handler not found"))
+		return
+	}
+
+	res, err = handler.Run(ctx, req).Get()
+	if err != nil {
+		entry.reject(fmt.Errorf("handler error: %s", err.Error()))
+		return
+	}
+
+	entry.resolve(res)
+	return
 }

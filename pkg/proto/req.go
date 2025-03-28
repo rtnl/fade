@@ -6,11 +6,10 @@ import (
 )
 
 type Req struct {
-	Key       string         `json:"#"`
-	Token     string         `json:"t"`
-	Namespace string         `json:"n"`
-	Method    string         `json:"m"`
-	Data      map[string]any `json:"d"`
+	Key    string         `json:"#"`
+	Token  string         `json:"t"`
+	Method string         `json:"m"`
+	Data   map[string]any `json:"d"`
 }
 
 func NewReq() (req *Req) {
@@ -22,6 +21,10 @@ func NewReq() (req *Req) {
 	return
 }
 
+func (req *Req) GetKey() string {
+	return req.Key
+}
+
 func (req *Req) WithToken(value string) *Req {
 	req.Token = value
 
@@ -30,16 +33,6 @@ func (req *Req) WithToken(value string) *Req {
 
 func (req *Req) GetToken() string {
 	return req.Token
-}
-
-func (req *Req) WithNamespace(value string) *Req {
-	req.Namespace = value
-
-	return req
-}
-
-func (req *Req) GetNamespace() string {
-	return req.Namespace
 }
 
 func (req *Req) WithMethod(value string) *Req {
