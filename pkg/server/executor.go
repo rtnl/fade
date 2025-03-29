@@ -86,7 +86,7 @@ func (e *Executor) Execute(ctx context.Context, entry *ExecutorEntry) {
 
 	handler, ok = e.server.GetHandlerByKey(req.GetMethod()).Get()
 	if !ok {
-		entry.reject(fmt.Errorf("handler not found"))
+		entry.resolve(proto.NewRes(proto.ResCodeFail, req.GetKey()))
 		return
 	}
 
