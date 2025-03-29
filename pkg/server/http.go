@@ -3,11 +3,15 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
+
+	"github.com/fasthttp/websocket"
 	"github.com/rtnl/fade/pkg/proto"
 	"github.com/samber/mo"
 	"github.com/valyala/fasthttp"
-	"log/slog"
 )
+
+var upgrader = websocket.FastHTTPUpgrader{}
 
 func (s *ServerImpl) RunHttp(ctx context.Context) mo.Result[any] {
 	var (
@@ -41,6 +45,12 @@ func (s *ServerImpl) handleHttpRequest(ctx *fasthttp.RequestCtx) {
 	case "/e":
 		{
 			s.handleHttpRequestExecute(ctx)
+			break
+		}
+
+	case "/s":
+		{
+			s.handleHttpRequestSession(ctx)
 			break
 		}
 
@@ -93,4 +103,8 @@ func (s *ServerImpl) handleHttpRequestExecute(ctx *fasthttp.RequestCtx) {
 	slog.Info("successfully executed req", slog.Any("req_key", req.Key))
 	ctx.Success("application/json", data)
 	return
+}
+
+func (s *ServerImpl) handleHttpRequestSession(ctx *fasthttp.RequestCtx) {
+	upgrader.Upgrade(ctx, s.handleWebsocketSession)
 }

@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/rtnl/fade/pkg/proto"
 	"github.com/samber/mo"
-	"time"
 )
 
 type ExecutorEntry struct {

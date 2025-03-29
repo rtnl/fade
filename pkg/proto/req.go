@@ -1,6 +1,8 @@
 package proto
 
 import (
+	"maps"
+
 	"github.com/google/uuid"
 	"github.com/samber/mo"
 )
@@ -17,6 +19,17 @@ func NewReq() (req *Req) {
 
 	req.Key = uuid.New().String()
 	req.Data = make(map[string]any)
+
+	return
+}
+
+func (req *Req) Clone() (other *Req) {
+	other = new(Req)
+
+	other.Key = req.Key
+	other.Token = req.Token
+	other.Method = req.Method
+	other.Data = maps.Clone(req.Data)
 
 	return
 }
